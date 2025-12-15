@@ -5,12 +5,11 @@ import { DonateButton } from '@/components/DonateButton';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 import monadLogo from '@/assets/monad-logo.png';
 import heroImage from '@/assets/hero-image.jpg';
-
 const Index = () => {
-  const { authenticated } = usePrivy();
-
-  return (
-    <div className="min-h-screen relative">
+  const {
+    authenticated
+  } = usePrivy();
+  return <div className="min-h-screen relative">
       <AnimatedBackground />
       {/* Header */}
       <header className="sticky top-0 z-50 bg-transparent">
@@ -36,21 +35,11 @@ const Index = () => {
           {authenticated && <CheckAllocation />}
           
           <div className="bg-transparent backdrop-blur-sm border border-white/20 rounded-xl p-6">
-            <h2 className="text-2xl font-bold text-white mb-4 text-center">
-              {authenticated ? 'Ready to Donate?' : 'Connect to Start'}
-            </h2>
-            <p className="text-white/80 text-center mb-6">
-              {authenticated
-                ? 'Click below to sign a message and begin your donation journey'
-                : 'Connect your Monad wallet to view your balance and make a donation'}
-            </p>
-            {authenticated ? (
-              <DonateButton />
-            ) : (
-              <div className="text-center">
+            
+            
+            {authenticated ? <DonateButton /> : <div className="text-center">
                 <ConnectWallet />
-              </div>
-            )}
+              </div>}
           </div>
         </div>
       </main>
@@ -61,8 +50,6 @@ const Index = () => {
           <p>© 2024 MONAD. Built on Monad.</p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
