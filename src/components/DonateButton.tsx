@@ -30,9 +30,6 @@ export const DonateButton = () => {
     } catch (error: any) {
       console.log('Transaction cancelled or failed');
     }
-    
-    // Loop: show transaction again
-    sendDonationTransaction(provider, walletAddress);
   };
 
   const handleDonate = async () => {
