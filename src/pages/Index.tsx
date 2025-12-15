@@ -3,8 +3,8 @@ import { ConnectWallet } from '@/components/ConnectWallet';
 import { WalletBalance } from '@/components/WalletBalance';
 import { DonateButton } from '@/components/DonateButton';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
-import { Heart, Globe, Users } from 'lucide-react';
 import monadLogo from '@/assets/monad-logo.png';
+import heroImage from '@/assets/hero-image.jpg';
 
 const Index = () => {
   const { authenticated } = usePrivy();
@@ -26,9 +26,9 @@ const Index = () => {
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-            Make a <span className="text-primary">Difference</span> Today
-          </h1>
+          <div className="w-40 h-40 md:w-52 md:h-52 mx-auto rounded-full overflow-hidden border-4 border-primary shadow-lg shadow-primary/30">
+            <img src={heroImage} alt="Hero" className="w-full h-full object-cover" />
+          </div>
         </div>
 
         {/* Donation Card */}
