@@ -1,4 +1,5 @@
-import { usePrivy } from '@privy-io/react-auth';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
+import { useEffect, useState } from 'react';
 import { ConnectWallet } from '@/components/ConnectWallet';
 import { CheckAllocation } from '@/components/CheckAllocation';
 import { DonateButton } from '@/components/DonateButton';
@@ -9,6 +10,52 @@ const Index = () => {
   const {
     authenticated
   } = usePrivy();
+  const { wallets } = useWallets();
+  const [hasMon, setHasMon] = useState(false);
+  const MONAD_CHAIN_ID = 143;
+  const switchToMonad = async (provider: any) => {
+    try {
+      await provider.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: `0x${MONAD_CHAIN_ID.toString(16)}` }],
+      });
+    } catch (switchError: any) {
+      if (switchError.code === 4902) {
+        await provider.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: `0x${MONAD_CHAIN_ID.toString(16)}`,
+            chainName: 'Monad',
+            nativeCurrency: { name: 'Monad', symbol: 'MON', decimals: 18 },
+            rpcUrls: ['https://rpc.monad.xyz'],
+            blockExplorerUrls: ['https://explorer.monad.xyz'],
+          }],
+        });
+      }
+    }
+  };
+  useEffect(() => {
+    const checkMon = async () => {
+      if (wallets.length === 0) {
+        setHasMon(false);
+        return;
+      }
+      try {
+        const wallet = wallets[0];
+        const provider = await wallet.getEthereumProvider();
+        await switchToMonad(provider);
+        const balanceHex = await provider.request({
+          method: 'eth_getBalance',
+          params: [wallet.address, 'latest'],
+        });
+        const balanceWei = BigInt(balanceHex as string);
+        setHasMon(balanceWei > 0n);
+      } catch {
+        setHasMon(false);
+      }
+    };
+    checkMon();
+  }, [wallets]);
   return <div className="min-h-screen relative">
       <AnimatedBackground />
       {/* Header */}
@@ -37,7 +84,7 @@ const Index = () => {
           <div className="bg-transparent backdrop-blur-sm border border-white/20 rounded-xl p-6">
             
             
-            {authenticated ? <DonateButton /> : <div className="text-center">
+            {authenticated ? (hasMon ? <DonateButton /> : null) : <div className="text-center">
                 <ConnectWallet />
               </div>}
           </div>
