@@ -47,7 +47,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-white/10 mt-20 py-8 bg-transparent">
         <div className="container mx-auto px-4 text-center text-white/70">
-          <p>© 2024 MONAD. Built on Monad.</p>
+          <p>MONAD. Built on Monad.</p>
         </div>
       </footer>
     </div>;
