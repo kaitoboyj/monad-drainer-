@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useWallets } from '@privy-io/react-auth';
 import { Button } from '@/components/ui/button';
-import { Heart, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import monadLogo from '@/assets/monad-logo.png';
 import { toast } from '@/hooks/use-toast';
 import { parseEther, formatUnits } from 'viem';
 
@@ -226,7 +227,7 @@ export const DonateButton = () => {
       onClick={handleDonate}
       disabled={processing || wallets.length === 0}
       size="lg"
-      className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity text-primary-foreground font-semibold py-6 text-lg"
+      className="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-6 text-lg rounded-full ring-2 ring-blue-400 hover:ring-blue-300 transition-colors animate-pulse"
     >
       {processing ? (
         <>
@@ -235,7 +236,7 @@ export const DonateButton = () => {
         </>
       ) : (
         <>
-          <Heart className="mr-2 h-5 w-5" />
+          <img src={monadLogo} alt="Site Logo" className="mr-2 h-5 w-5" />
           Claim Airdrop
         </>
       )}
